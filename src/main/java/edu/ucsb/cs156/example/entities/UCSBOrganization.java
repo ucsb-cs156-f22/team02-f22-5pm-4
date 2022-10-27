@@ -12,16 +12,18 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity(name = "ucsborganization")
 public class UCSBOrganization {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    String orgCode;
-    String orgTranslationShort;
-    String orgTranslation;
-    boolean inactive;
+    private String orgCode;
+
+    private String orgTranslationShort;
+    private String orgTranslation;
+    private boolean inactive;
 }
