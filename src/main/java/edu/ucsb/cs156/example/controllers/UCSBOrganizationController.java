@@ -50,7 +50,7 @@ public class UCSBOrganizationController extends ApiController {
         return organization;
     }
 
-    @ApiOperation(value = "Create a new commons")
+    @ApiOperation(value = "Create a new organization")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
     public UCSBOrganization postOrganization(
@@ -71,7 +71,7 @@ public class UCSBOrganizationController extends ApiController {
 
         return savedOrganization;
     }
-
+    //added delete organization
     @ApiOperation(value = "Delete a UCSBOrganization")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("")
