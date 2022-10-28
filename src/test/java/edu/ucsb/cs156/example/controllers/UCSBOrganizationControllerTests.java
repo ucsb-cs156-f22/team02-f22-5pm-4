@@ -57,7 +57,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/ucsborganization?code=carrillo"))
+                mockMvc.perform(get("/api/ucsborganization?orgcode=SKY"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
@@ -131,35 +131,31 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 // arrange
 
-                UCSBDOrganization SKYDIVING = UCSBOrganization.builder()
+                UCSBOrganization SKYDIVING = UCSBOrganization.builder()
                                 .orgCode("SKY")
-                                .hasSackMeal("SKYDIVING CLUB")
-                                .hasTakeOutMeal("SKYDIVING CLUB AT UCSB")
+                                .orgTranslationShort("SKYDIVING CLUB")
+                                .orgTranslation("SKYDIVING CLUB AT UCSB")
                                 .inactive(false);
 
-                UCSBOrganization STUDENTLIFE = UCSBOrganization.builder() ////////// STOPPED HERE COME BACK HERE
-                                .name("De La Guerra")
-                                .code("de-la-guerra")
-                                .hasSackMeal(false)
-                                .hasTakeOutMeal(false)
-                                .hasDiningCam(true)
-                                .latitude(34.409811)
-                                .longitude(-119.845026)
-                                .build();
+                UCSBOrganization STUDENTLIFE = UCSBOrganization.builder()
+                                .orgCode("OSLI")
+                                .orgTranslationShort("STUDENT LIFE")
+                                .orgTranslation("OFFICE OF STUDENT LIFE")
+                                .inactive(false);
 
-                ArrayList<UCSBDiningCommons> expectedCommons = new ArrayList<>();
-                expectedCommons.addAll(Arrays.asList(carrillo, dlg));
+                ArrayList<UCSBOrganization> expectedOrganization = new ArrayList<>();
+                expectedOrganization.addAll(Arrays.asList(SKYDIVING, STUDENTLIFE));
 
-                when(ucsbDiningCommonsRepository.findAll()).thenReturn(expectedCommons);
+                when(ucsbOrganizationRepository.findAll()).thenReturn(expectedOrganization);
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdiningcommons/all"))
+                MvcResult response = mockMvc.perform(get("/api/ucsborganization/all"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbDiningCommonsRepository, times(1)).findAll();
-                String expectedJson = mapper.writeValueAsString(expectedCommons);
+                verify(ucsbOrganizationRepository, times(1)).findAll();
+                String expectedJson = mapper.writeValueAsString(expectedOrganization);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -169,27 +165,23 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
         public void an_admin_user_can_post_a_new_commons() throws Exception {
                 // arrange
 
-                UCSBDiningCommons ortega = UCSBDiningCommons.builder()
-                                .name("Ortega")
-                                .code("ortega")
-                                .hasSackMeal(true)
-                                .hasTakeOutMeal(true)
-                                .hasDiningCam(true)
-                                .latitude(34.410987)
-                                .longitude(-119.84709)
-                                .build();
+                UCSBOrganization KOREAN = UCSBOrganization.builder()
+                                .orgCode("KRC")
+                                .orgTranslation("KOREAN RADIO CL")
+                                .orgTranslation("KOREAN RADIO CLUB")
+                                .inactive(false);
 
-                when(ucsbDiningCommonsRepository.save(eq(ortega))).thenReturn(ortega);
+                when(ucsbOrganizationRepository.save(eq(KOREAN))).thenReturn(KOREAN);
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/ucsbdiningcommons/post?name=Ortega&code=ortega&hasSackMeal=true&hasTakeOutMeal=true&hasDiningCam=true&latitude=34.410987&longitude=-119.84709")
+                                post("/api/ucsborganization/post?orgcode=KRC&orgtranslation=KOREANRADIOCL&orgtranslation=KOREANRADIOCLUB&inactive=false")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(ucsbDiningCommonsRepository, times(1)).save(ortega);
-                String expectedJson = mapper.writeValueAsString(ortega);
+                verify(ucsbOrganizationRepository, times(1)).save(KOREAN);
+                String expectedJson = mapper.writeValueAsString(KOREAN);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -199,13 +191,13 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
         public void admin_can_delete_a_date() throws Exception {
                 // arrange
 
-                UCSBOrganization SKY = UCSBOrganization.builder()
+                UCSBOrganization skydiving = UCSBOrganization.builder()
                                 .orgCode("SKY")
                                 .orgTranslationShort("SKYDIVING CLUB")
                                 .orgTranslation("SKYDIVING CLUB AT UCSB")
                                 .inactive(false);
 
-                when(ucsbOrganizationRepository.findById(eq("SKY"))).thenReturn(Optional.of(SKY));
+                when(ucsbOrganizationRepository.findById(eq("SKY"))).thenReturn(Optional.of(skydiving));
 
                 // act
                 MvcResult response = mockMvc.perform(
@@ -246,14 +238,14 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
         public void admin_can_edit_an_existing_commons() throws Exception {
                 // arrange
 
-                UCSBOrganization studentLifeOrig = UCSBorganization.builder()
-                                .orgcode("OSLI")
+                UCSBOrganization studentLifeOrig = UCSBOrganization.builder()
+                                .orgCode("OSLI")
                                 .orgTranslationShort("STUDENT LIFE")
                                 .orgTranslation("OFFICE OF STUDENT LIFE")
                                 .inactive(true);
 
                 UCSBOrganization studentLifeEdited = UCSBOrganization.builder()
-                                .orgcode("OSLI")
+                                .orgCode("OSLI")
                                 .orgTranslationShort("STUDENT LIFE")
                                 .orgTranslation("OFFICE OF STUDENT LIFE")
                                 .inactive(false);
