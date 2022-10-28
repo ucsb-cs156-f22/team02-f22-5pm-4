@@ -240,7 +240,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("UCSBOrganization with orgCode FRC not found", json.get("message"));
         }
-
+        //added the put tests
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_can_edit_an_existing_commons() throws Exception {
