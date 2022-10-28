@@ -1,4 +1,4 @@
-package main.java.edu.ucsb.cs156.example.controllers;
+package edu.ucsb.cs156.example.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,8 +13,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import main.java.edu.ucsb.cs156.example.entities.Recommendation;
-import main.java.edu.ucsb.cs156.example.repositories.RecommendationRepository;
+import edu.ucsb.cs156.example.entities.Recommendation;
+import edu.ucsb.cs156.example.repositories.RecommendationRepository;
 @Api(description = "recommendations")
 @RequestMapping("/api/recommendations")
 @RestController

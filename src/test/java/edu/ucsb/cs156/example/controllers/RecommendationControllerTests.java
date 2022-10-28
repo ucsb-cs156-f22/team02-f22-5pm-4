@@ -2,10 +2,9 @@ package edu.ucsb.cs156.example.controllers;
 
 import edu.ucsb.cs156.example.repositories.UserRepository;
 import edu.ucsb.cs156.example.testconfig.TestConfig;
-import main.java.edu.ucsb.cs156.example.repositories.RecommendationRepository;
 import edu.ucsb.cs156.example.ControllerTestCase;
 import edu.ucsb.cs156.example.entities.Recommendation;
-import edu.ucsb.cs156.example.repositories.RecommendationController;
+import edu.ucsb.cs156.example.repositories.RecommendationRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @WebMvcTest(controllers = RecommendationController.class)
 @Import(TestConfig.class)
 public class RecommendationControllerTests extends ControllerTestCase {
@@ -42,6 +42,14 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
         @MockBean
         UserRepository userRepository;
+
+        LocalDateTime dateRequested = LocalDateTime.parse("2022-01-03");
+        LocalDateTime dateNeeded = LocalDateTime.parse("2022-03-11");
+        LocalDateTime dateRequested2 = LocalDateTime.parse("2022-02-03");
+        LocalDateTime dateNeeded2 = LocalDateTime.parse("2022-04-11");
+
+        long id = 7;
+        boolean done = true;
 
         // Authorization tests for /api/recommendations/admin/all
 
@@ -87,13 +95,12 @@ public class RecommendationControllerTests extends ControllerTestCase {
         public void test_that_logged_in_user_can_get_by_id_when_the_id_exists() throws Exception {
 
                 // arrange
-                LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 Recommendation recommendation = Recommendation.builder()
                                 .id(id)
-                                .requesterEmail(requesterEmail)
-                                .professorEmail(professorEmail)
-                                .explination(explination)
+                                .requesterEmail("requester@ucsb.edu")
+                                .professorEmail("professor@ucsb.edu")
+                                .explination("reason")
                                 .dateRequested(dateRequested)
                                 .dateNeeded(dateNeeded)
                                 .done(done)
@@ -135,31 +142,26 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "USER" })
         @Test
-        public void logged_in_user_can_get_all_ucsbdates() throws Exception {
+        public void logged_in_user_can_get_all_recommendations() throws Exception {
 
                 // arrange
-                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03");
-                LocalDateTime ldt2 = LocalDateTime.parse("2022-03-11");
-                LocalDateTime ldt3 = LocalDateTime.parse("2022-02-03");
-                LocalDateTime ldt4 = LocalDateTime.parse("2022-04-11");
-
                 Recommendation recommendation1 = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
-                                        .explination("this is an explination")
-                                        .dateRequested(ldt1)
-                                        .dateNeeded(ldt2)
+                                        .professorEmail("professor@ucsb.edu")
+                                        .explination("reason")
+                                        .dateRequested(dateRequested)
+                                        .dateNeeded(dateNeeded)
                                         .done(done)
                                 .build();
 
                 Recommendation recommendation2 = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
-                                        .explination("this is an explination")
-                                        .dateRequested(ldt3)
-                                        .dateNeeded(ldt4)
+                                        .professorEmail("professor@ucsb.edu")
+                                        .explination("reason")
+                                        .dateRequested(dateRequested2)
+                                        .dateNeeded(dateNeeded2)
                                         .done(done)
                                 .build();
 
@@ -185,16 +187,13 @@ public class RecommendationControllerTests extends ControllerTestCase {
         public void an_admin_user_can_post_a_new_recommendation() throws Exception {
                 // arrange
 
-                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03");
-                LocalDateTime ldt2 = LocalDateTime.parse("2022-02-03");
-
                 Recommendation recommendation1 = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .professorEmail("professor@ucsb.edu")
                                         .explination("reason")
-                                        .dateRequested(ldt1)
-                                        .dateNeeded(ldt2)
+                                        .dateRequested(dateRequested)
+                                        .dateNeeded(dateNeeded)
                                         .done(done)
                                 .build();
 
@@ -217,16 +216,13 @@ public class RecommendationControllerTests extends ControllerTestCase {
         @Test
         public void admin_can_delete_a_recommendation() throws Exception {
 
-                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03");
-                LocalDateTime ldt2 = LocalDateTime.parse("2022-02-03");
-
                 Recommendation recommendation1 = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .professorEmail("professor@ucsb.edu")
                                         .explination("reason")
-                                        .dateRequested(ldt1)
-                                        .dateNeeded(ldt2)
+                                        .dateRequested(dateRequested)
+                                        .dateNeeded(dateNeeded)
                                         .done(done)
                                 .build();
 
@@ -248,7 +244,7 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_tries_to_delete_non_existant_ucsbdate_and_gets_right_error_message()
+        public void admin_tries_to_delete_non_existant_recommendation_and_gets_right_error_message()
                         throws Exception {
                 // arrange
 
@@ -271,31 +267,27 @@ public class RecommendationControllerTests extends ControllerTestCase {
         public void admin_can_edit_an_existing_recommendation() throws Exception {
                 // arrange
 
-                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03");
-                LocalDateTime ldt2 = LocalDateTime.parse("2022-02-03");
-                LocalDateTime ldt3 = LocalDateTime.parse("2022-03-04");
-
                 Recommendation recommendationOrig = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .professorEmail("professor@ucsb.edu")
                                         .explination("reason")
-                                        .dateRequested(ldt1)
-                                        .dateNeeded(ldt2)
+                                        .dateRequested(dateRequested)
+                                        .dateNeeded(dateNeeded)
                                         .done(done)
                                 .build();
 
                 Recommendation recommendationEdited = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .professorEmail("professor@ucsb.edu")
                                         .explination("reason")
-                                        .dateRequested(ldt1)
-                                        .dateNeeded(ldt3)
+                                        .dateRequested(dateRequested)
+                                        .dateNeeded(dateNeeded2)
                                         .done(done)
                                 .build();
 
-                String requestBody = mapper.writeValueAsString(ucsbDateEdited);
+                String requestBody = mapper.writeValueAsString(recommendationEdited);
 
                 when(recommendationRepository.findById(eq(67L))).thenReturn(Optional.of(recommendationOrig));
 
@@ -321,14 +313,16 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 // arrange
 
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03");
+                long id = 7;
+                boolean done = true;
 
                 Recommendation recommendationEdited = Recommendation.builder()
                                         .id(id)
                                         .requesterEmail("requester@ucsb.edu")
-                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .professorEmail("professor@ucsb.edu")
                                         .explination("reason")
-                                        .dateRequested(ldt1)
-                                        .dateNeeded(ldt2)
+                                        .dateRequested(dateRequested)
+                                        .dateNeeded(dateNeeded)
                                         .done(done)
                                 .build();
 
