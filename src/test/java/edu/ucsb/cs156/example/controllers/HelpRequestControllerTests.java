@@ -254,76 +254,85 @@ public class HelpRequestControllerTests extends ControllerTestCase {
 //                 assertEquals("UCSBDate with id 15 not found", json.get("message"));
 //         }
 
-//         @WithMockUser(roles = { "ADMIN", "USER" })
-//         @Test
-//         public void admin_can_edit_an_existing_ucsbdate() throws Exception {
-//                 // arrange
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void admin_can_edit_an_existing_helprequest() throws Exception {
+                // arrange
 
-//                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
-//                 LocalDateTime ldt2 = LocalDateTime.parse("2023-01-03T00:00:00");
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-04-20T17:35:00");
+                LocalDateTime ldt2 = LocalDateTime.parse("2022-04-20T19:35:00");
 
-//                 UCSBDate ucsbDateOrig = UCSBDate.builder()
-//                                 .name("firstDayOfClasses")
-//                                 .quarterYYYYQ("20222")
-//                                 .localDateTime(ldt1)
-//                                 .build();
+                HelpRequest helpRequestOrig = HelpRequest.builder()
+                                .requesterEmail("cgaucho@ucsb.edu")
+                                .teamId("s22-5pm-3")
+                                .tableOrBreakoutRoom("7")
+                                .requestTime(ldt1)
+                                .explanation("Need help with Swagger-ui")
+                                .solved(false)
+                                .build();
 
-//                 UCSBDate ucsbDateEdited = UCSBDate.builder()
-//                                 .name("firstDayOfFestivus")
-//                                 .quarterYYYYQ("20232")
-//                                 .localDateTime(ldt2)
-//                                 .build();
+                HelpRequest helpRequestEdited = HelpRequest.builder()
+                                .requesterEmail("cgaucho@ucsb.edu")
+                                .teamId("s22-5pm-4")
+                                .tableOrBreakoutRoom("8")
+                                .requestTime(ldt1)
+                                .explanation("Need help with Swagger-ui")
+                                .solved(false)
+                                .build();
 
-//                 String requestBody = mapper.writeValueAsString(ucsbDateEdited);
+                String requestBody = mapper.writeValueAsString(helpRequestEdited);
 
-//                 when(ucsbDateRepository.findById(eq(67L))).thenReturn(Optional.of(ucsbDateOrig));
+                when(helpRequestRepository.findById(eq(67L))).thenReturn(Optional.of(helpRequestOrig));
 
-//                 // act
-//                 MvcResult response = mockMvc.perform(
-//                                 put("/api/ucsbdates?id=67")
-//                                                 .contentType(MediaType.APPLICATION_JSON)
-//                                                 .characterEncoding("utf-8")
-//                                                 .content(requestBody)
-//                                                 .with(csrf()))
-//                                 .andExpect(status().isOk()).andReturn();
+                // act
+                MvcResult response = mockMvc.perform(
+                                put("/api/HelpRequest?id=67")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .characterEncoding("utf-8")
+                                                .content(requestBody)
+                                                .with(csrf()))
+                                .andExpect(status().isOk()).andReturn();
 
-//                 // assert
-//                 verify(ucsbDateRepository, times(1)).findById(67L);
-//                 verify(ucsbDateRepository, times(1)).save(ucsbDateEdited); // should be saved with correct user
-//                 String responseString = response.getResponse().getContentAsString();
-//                 assertEquals(requestBody, responseString);
-//         }
+                // assert
+                verify(helpRequestRepository, times(1)).findById(67L);
+                verify(helpRequestRepository, times(1)).save(helpRequestEdited); // should be saved with correct user
+                String responseString = response.getResponse().getContentAsString();
+                assertEquals(requestBody, responseString);
+        }
 
-//         @WithMockUser(roles = { "ADMIN", "USER" })
-//         @Test
-//         public void admin_cannot_edit_ucsbdate_that_does_not_exist() throws Exception {
-//                 // arrange
+        @WithMockUser(roles = { "ADMIN", "USER" })
+        @Test
+        public void admin_cannot_edit_helprequest_that_does_not_exist() throws Exception {
+                // arrange
 
-//                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-04-20T17:35:00");
 
-//                 UCSBDate ucsbEditedDate = UCSBDate.builder()
-//                                 .name("firstDayOfClasses")
-//                                 .quarterYYYYQ("20222")
-//                                 .localDateTime(ldt1)
-//                                 .build();
+                HelpRequest helpEditedRequest = HelpRequest.builder()
+                                .requesterEmail("cgaucho@ucsb.edu")
+                                .teamId("s22-5pm-3")
+                                .tableOrBreakoutRoom("7")
+                                .requestTime(ldt1)
+                                .explanation("Need help with Swagger-ui")
+                                .solved(false)
+                                .build();
 
-//                 String requestBody = mapper.writeValueAsString(ucsbEditedDate);
+                String requestBody = mapper.writeValueAsString(helpEditedRequest);
 
-//                 when(ucsbDateRepository.findById(eq(67L))).thenReturn(Optional.empty());
+                when (helpRequestRepository.findById(eq(67L))).thenReturn(Optional.empty());
 
-//                 // act
-//                 MvcResult response = mockMvc.perform(
-//                                 put("/api/ucsbdates?id=67")
-//                                                 .contentType(MediaType.APPLICATION_JSON)
-//                                                 .characterEncoding("utf-8")
-//                                                 .content(requestBody)
-//                                                 .with(csrf()))
-//                                 .andExpect(status().isNotFound()).andReturn();
+                // act
+                MvcResult response = mockMvc.perform(
+                                put("/api/HelpRequest?id=67")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .characterEncoding("utf-8")
+                                                .content(requestBody)
+                                                .with(csrf()))
+                                .andExpect(status().isNotFound()).andReturn();
 
-//                 // assert
-//                 verify(ucsbDateRepository, times(1)).findById(67L);
-//                 Map<String, Object> json = responseToJson(response);
-//                 assertEquals("UCSBDate with id 67 not found", json.get("message"));
+                // assert
+                verify(helpRequestRepository, times(1)).findById(67L);
+                Map<String, Object> json = responseToJson(response);
+                assertEquals("HelpRequest with id 67 not found", json.get("message"));
 
-//        }
+       }
 }
