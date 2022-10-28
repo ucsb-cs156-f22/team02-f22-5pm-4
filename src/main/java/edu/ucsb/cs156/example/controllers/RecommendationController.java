@@ -60,4 +60,15 @@ public Recommendation postRecommendation(
         return recommendation;
     }
 
+    @ApiOperation(value = "Get a single recommendation")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("")
+    public Recommendation getById(
+            @ApiParam("id") @RequestParam Long id) {
+        Recommendation recommendation = recommendationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
+
+        return recommendation;
+    }
+
 }
