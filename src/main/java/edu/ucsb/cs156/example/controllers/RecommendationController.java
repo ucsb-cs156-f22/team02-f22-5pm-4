@@ -71,4 +71,28 @@ public Recommendation postRecommendation(
         return recommendation;
     }
 
+    @ApiOperation(value = "Update a single recommendation")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public Recommendation updateRecommendation(
+            @ApiParam("id") @RequestParam Long id,
+            @RequestBody @Valid edu.ucsb.cs156.example.entities.Recommendation incoming) {
+
+        edu.ucsb.cs156.example.entities.Recommendation recommendation = recommendationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
+
+        recommendation.setDateNeeded(incoming.getDateNeeded());
+        recommendation.setDateRequested(incoming.getDateRequested());
+        recommendation.setDone(incoming.getDone());
+        recommendation.setExplination(incoming.getExplination());
+        recommendation.setId(incoming.getId());
+        recommendation.setProfessorEmail(incoming.getProfessorEmail());
+        recommendation.setRequesterEmail(incoming.getProfessorEmail());
+
+        recommendationRepository.save(RecordComponent);
+
+        return recommendation;
+    }
+
+
 }
