@@ -73,7 +73,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_regular_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/ucsborganization/spost"))
+                mockMvc.perform(post("/api/ucsborganizations/post"))
                                 .andExpect(status().is(403)); // only admins can post
         }
 
@@ -170,7 +170,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 UCSBOrganization KOREAN = UCSBOrganization.builder()
                                 .orgCode("KRC")
-                                .orgTranslation("KOREAN RADIO CL")
+                                .orgTranslationShort("KOREAN RADIO CL")
                                 .orgTranslation("KOREAN RADIO CLUB")
                                 .inactive(false)
                                 .build();
@@ -179,7 +179,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/ucsborganizations/post?orgCode=KRC&orgtranslation=KOREANRADIOCL&orgtranslation=KOREANRADIOCLUB&inactive=false")
+                                post("/api/ucsborganizations/post?orgCode=KRC&orgTranslationShort=KOREAN RADIO CL&orgTranslation=KOREAN RADIO CLUB&inactive=false")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -263,7 +263,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/ucsborganizations?code=OSLI")
+                                put("/api/ucsborganizations?orgCode=OSLI")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
