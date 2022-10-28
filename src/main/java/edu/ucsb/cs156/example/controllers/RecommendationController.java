@@ -31,15 +31,4 @@ public class RecommendationController extends ApiController {
         Iterable<Recommendation> recommendations = recommendationRepository.findAll();
         return recommendations;
     }
-
-    @ApiOperation(value = "Get a single recommendation")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("")
-    public Recommendation getById(
-            @ApiParam("id") @RequestParam Long id) {
-        Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
-
-        return recommendation;
-    }
 }

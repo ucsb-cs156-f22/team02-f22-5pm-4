@@ -88,31 +88,27 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
                 // arrange
                 LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
-                private long id;
-  private String requesterEmail;
-  private String professorEmail;
-  private String explination;
-  private LocalDateTime dateRequested;
-  private LocalDateTime dateNeeded;
-  private boolean done;
 
                 Recommendation recommendation = Recommendation.builder()
                                 .id(id)
                                 .requesterEmail(requesterEmail)
                                 .professorEmail(professorEmail)
                                 .explination(explination)
+                                .dateRequested(dateRequested)
+                                .dateNeeded(dateNeeded)
+                                .done(done)
                                 .build();
 
-                when(ucsbDateRepository.findById(eq(7L))).thenReturn(Optional.of(ucsbDate));
+                when(recommendationRepository.findById(eq(7L))).thenReturn(Optional.of(recommendation));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdates?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/recommendations?id=7"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbDateRepository, times(1)).findById(eq(7L));
-                String expectedJson = mapper.writeValueAsString(ucsbDate);
+                verify(recommendationRepository, times(1)).findById(eq(7L));
+                String expectedJson = mapper.writeValueAsString(recommendation);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -123,18 +119,18 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
                 // arrange
 
-                when(ucsbDateRepository.findById(eq(7L))).thenReturn(Optional.empty());
+                when(recommendationRepository.findById(eq(7L))).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdates?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/recommendations?id=7"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
 
-                verify(ucsbDateRepository, times(1)).findById(eq(7L));
+                verify(recommendationRepository, times(1)).findById(eq(7L));
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("UCSBDate with id 7 not found", json.get("message"));
+                assertEquals("Recommendation with id 7 not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "USER" })
@@ -142,53 +138,66 @@ public class RecommendationControllerTests extends ControllerTestCase {
         public void logged_in_user_can_get_all_ucsbdates() throws Exception {
 
                 // arrange
-                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03");
+                LocalDateTime ldt2 = LocalDateTime.parse("2022-03-11");
+                LocalDateTime ldt3 = LocalDateTime.parse("2022-02-03");
+                LocalDateTime ldt4 = LocalDateTime.parse("2022-04-11");
 
-                UCSBDate ucsbDate1 = UCSBDate.builder()
-                                .name("firstDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt1)
+                Recommendation recommendation1 = Recommendation.builder()
+                                        .id(id)
+                                        .requesterEmail("requester@ucsb.edu")
+                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .explination("this is an explination")
+                                        .dateRequested(ldt1)
+                                        .dateNeeded(ldt2)
+                                        .done(done)
                                 .build();
 
-                LocalDateTime ldt2 = LocalDateTime.parse("2022-03-11T00:00:00");
-
-                UCSBDate ucsbDate2 = UCSBDate.builder()
-                                .name("lastDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt2)
+                Recommendation recommendation2 = Recommendation.builder()
+                                        .id(id)
+                                        .requesterEmail("requester@ucsb.edu")
+                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .explination("this is an explination")
+                                        .dateRequested(ldt3)
+                                        .dateNeeded(ldt4)
+                                        .done(done)
                                 .build();
 
-                ArrayList<UCSBDate> expectedDates = new ArrayList<>();
-                expectedDates.addAll(Arrays.asList(ucsbDate1, ucsbDate2));
+                ArrayList<Recommendation> expectedRecommendations = new ArrayList<>();
+                expectedRecommendations.addAll(Arrays.asList(recommendation1, recommendation2));
 
-                when(ucsbDateRepository.findAll()).thenReturn(expectedDates);
+                when(recommendationRepository.findAll()).thenReturn(expectedRecommendations);
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdates/all"))
+                MvcResult response = mockMvc.perform(get("/api/recommendations/all"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbDateRepository, times(1)).findAll();
-                String expectedJson = mapper.writeValueAsString(expectedDates);
+                verify(recommendationRepository, times(1)).findAll();
+                String expectedJson = mapper.writeValueAsString(expectedRecommendations);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void an_admin_user_can_post_a_new_ucsbdate() throws Exception {
+        public void an_admin_user_can_post_a_new_recommendation() throws Exception {
                 // arrange
 
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
 
-                UCSBDate ucsbDate1 = UCSBDate.builder()
-                                .name("firstDayOfClasses")
-                                .quarterYYYYQ("20222")
-                                .localDateTime(ldt1)
+                Recommendation recommendation1 = Recommendation.builder()
+                                        .id(id)
+                                        .requesterEmail("requester@ucsb.edu")
+                                        .professorEmail("professorEmail@ucsb.edu")
+                                        .explination("this is an explination")
+                                        .dateRequested(ldt1)
+                                        .dateNeeded(ldt2)
+                                        .done(done)
                                 .build();
 
-                when(ucsbDateRepository.save(eq(ucsbDate1))).thenReturn(ucsbDate1);
+                when(recommendationRepository.save(eq(recommendation1))).thenReturn(recommendation1);
 
                 // act
                 MvcResult response = mockMvc.perform(
