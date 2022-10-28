@@ -81,7 +81,7 @@ public class UCSBOrganizationController extends ApiController {
                 .orElseThrow(() -> new EntityNotFoundException(UCSBOrganization.class, orgCode));
 
         ucsbOrganizationRepository.delete(organization);
-        return genericMessage("UCSBOrganization with id %s deleted".formatted(orgCode));
+        return genericMessage("UCSBOrganization with orgCode %s deleted".formatted(orgCode));
     }
 
     @ApiOperation(value = "Update a single organization")

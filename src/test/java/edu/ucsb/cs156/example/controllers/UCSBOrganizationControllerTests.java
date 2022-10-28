@@ -44,36 +44,36 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
         @Test
         public void logged_out_users_cannot_get_all() throws Exception {
-                mockMvc.perform(get("/api/ucsborganization/all"))
+                mockMvc.perform(get("/api/ucsborganizations/all"))
                                 .andExpect(status().is(403)); // logged out users can't get all
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_users_can_get_all() throws Exception {
-                mockMvc.perform(get("/api/ucsborganization/all"))
+                mockMvc.perform(get("/api/ucsborganizations/all"))
                                 .andExpect(status().is(200)); // logged
         }
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/ucsborganization?orgcode=SKY"))
+                mockMvc.perform(get("/api/ucsborganizations?orgCode=SKY"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
-        // Authorization tests for /api/ucsborganization/post
+        // Authorization tests for /api/ucsborganizations/post
         // (Perhaps should also have these for put and delete)
 
         @Test
         public void logged_out_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/ucsborganization/post"))
+                mockMvc.perform(post("/api/ucsborganizations/post"))
                                 .andExpect(status().is(403));
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_regular_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/ucsborganization/post"))
+                mockMvc.perform(post("/api/ucsborganization/spost"))
                                 .andExpect(status().is(403)); // only admins can post
         }
 
@@ -89,12 +89,13 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                                 .orgCode("SKY")
                                 .orgTranslationShort("SKYDIVING CLUB")
                                 .orgTranslation("SKYDIVING CLUB AT UCSB")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 when(ucsbOrganizationRepository.findById(eq("SKY"))).thenReturn(Optional.of(organization));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsborganization?orgcode=SKY"))
+                MvcResult response = mockMvc.perform(get("/api/ucsborganizations?orgCode=SKY"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
@@ -114,7 +115,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                 when(ucsbOrganizationRepository.findById(eq("SKY"))).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsborganization?orgcode=SKY"))
+                MvcResult response = mockMvc.perform(get("/api/ucsborganizations?orgCode=SKY"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
@@ -122,12 +123,12 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                 verify(ucsbOrganizationRepository, times(1)).findById(eq("SKY"));
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("UCSBOrganization with orgcode SKY not found", json.get("message"));
+                assertEquals("UCSBOrganization with id SKY not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
-        public void logged_in_user_can_get_all_ucsborganization() throws Exception {
+        public void logged_in_user_can_get_all_organizations() throws Exception {
 
                 // arrange
 
@@ -135,13 +136,15 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                                 .orgCode("SKY")
                                 .orgTranslationShort("SKYDIVING CLUB")
                                 .orgTranslation("SKYDIVING CLUB AT UCSB")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 UCSBOrganization STUDENTLIFE = UCSBOrganization.builder()
                                 .orgCode("OSLI")
                                 .orgTranslationShort("STUDENT LIFE")
                                 .orgTranslation("OFFICE OF STUDENT LIFE")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 ArrayList<UCSBOrganization> expectedOrganization = new ArrayList<>();
                 expectedOrganization.addAll(Arrays.asList(SKYDIVING, STUDENTLIFE));
@@ -149,7 +152,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                 when(ucsbOrganizationRepository.findAll()).thenReturn(expectedOrganization);
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsborganization/all"))
+                MvcResult response = mockMvc.perform(get("/api/ucsborganizations/all"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
@@ -162,20 +165,21 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void an_admin_user_can_post_a_new_commons() throws Exception {
+        public void an_admin_user_can_post_a_new_organization() throws Exception {
                 // arrange
 
                 UCSBOrganization KOREAN = UCSBOrganization.builder()
                                 .orgCode("KRC")
                                 .orgTranslation("KOREAN RADIO CL")
                                 .orgTranslation("KOREAN RADIO CLUB")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 when(ucsbOrganizationRepository.save(eq(KOREAN))).thenReturn(KOREAN);
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/ucsborganization/post?orgcode=KRC&orgtranslation=KOREANRADIOCL&orgtranslation=KOREANRADIOCLUB&inactive=false")
+                                post("/api/ucsborganizations/post?orgCode=KRC&orgtranslation=KOREANRADIOCL&orgtranslation=KOREANRADIOCLUB&inactive=false")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -195,13 +199,14 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                                 .orgCode("SKY")
                                 .orgTranslationShort("SKYDIVING CLUB")
                                 .orgTranslation("SKYDIVING CLUB AT UCSB")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 when(ucsbOrganizationRepository.findById(eq("SKY"))).thenReturn(Optional.of(skydiving));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/ucsborganization?orgcode=SKY")
+                                delete("/api/ucsborganizations?orgCode=SKY")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -215,7 +220,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_tries_to_delete_non_existant_commons_and_gets_right_error_message()
+        public void admin_tries_to_delete_non_existant_organization_and_gets_right_error_message()
                         throws Exception {
                 // arrange
 
@@ -223,32 +228,34 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/ucsborganization?orgcode=FRC")
+                                delete("/api/ucsborganizations?orgCode=FRC")
                                                 .with(csrf()))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
                 verify(ucsbOrganizationRepository, times(1)).findById("FRC");
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBOrganization with orgCode FRC not found", json.get("message"));
+                assertEquals("UCSBOrganization with id FRC not found", json.get("message"));
         }
         //added the put tests
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_edit_an_existing_commons() throws Exception {
+        public void admin_can_edit_an_existing_organization() throws Exception {
                 // arrange
 
                 UCSBOrganization studentLifeOrig = UCSBOrganization.builder()
                                 .orgCode("OSLI")
                                 .orgTranslationShort("STUDENT LIFE")
                                 .orgTranslation("OFFICE OF STUDENT LIFE")
-                                .inactive(true);
+                                .inactive(true)
+                                .build();
 
                 UCSBOrganization studentLifeEdited = UCSBOrganization.builder()
                                 .orgCode("OSLI")
                                 .orgTranslationShort("STUDENT LIFE")
                                 .orgTranslation("OFFICE OF STUDENT LIFE")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 String requestBody = mapper.writeValueAsString(studentLifeEdited);
 
@@ -256,7 +263,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/ucsborganization?code=OSLI")
+                                put("/api/ucsborganizations?code=OSLI")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -272,14 +279,15 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_cannot_edit_commons_that_does_not_exist() throws Exception {
+        public void admin_cannot_edit_organization_that_does_not_exist() throws Exception {
                 // arrange
 
                 UCSBOrganization editedOrganization = UCSBOrganization.builder()
                                 .orgCode("FRC")
                                 .orgTranslationShort("FURRY CLUB")
                                 .orgTranslation("FURRY CLUB AT UCSB")
-                                .inactive(false);
+                                .inactive(false)
+                                .build();
 
                 String requestBody = mapper.writeValueAsString(editedOrganization);
 
@@ -287,7 +295,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/ucsborganization?orgcode=FRC")
+                                put("/api/ucsborganizations?orgCode=FRC")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -297,7 +305,7 @@ public class UCSBOrganizationControllerTests extends ControllerTestCase {
                 // assert
                 verify(ucsbOrganizationRepository, times(1)).findById("FRC");
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBOrganization with orgCode FRC not found", json.get("message"));
+                assertEquals("UCSBOrganization with id FRC not found", json.get("message"));
 
         }
 }
