@@ -41,24 +41,24 @@ public class RecommendationControllerTests extends ControllerTestCase {
         @MockBean
         UserRepository userRepository;
 
-        // Authorization tests for /api/recommendations/admin/all
+        // Authorization tests for /api/recommendation/admin/all
 
         @Test
         public void logged_out_users_cannot_get_all() throws Exception {
-                mockMvc.perform(get("/api/recommendations/all"))
+                mockMvc.perform(get("/api/Recommendation/all"))
                                 .andExpect(status().is(403)); // logged out users can't get all
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_users_can_get_all() throws Exception {
-                mockMvc.perform(get("/api/recommendations/all"))
+                mockMvc.perform(get("/api/Recommendation/all"))
                                 .andExpect(status().is(200)); // logged
         }
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/recommendations?id=7"))
+                mockMvc.perform(get("/api/Recommendation?id=7"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
@@ -67,14 +67,14 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
         @Test
         public void logged_out_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/recommendations/post"))
+                mockMvc.perform(post("/api/Recommendation/post"))
                                 .andExpect(status().is(403));
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_regular_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/recommendations/post"))
+                mockMvc.perform(post("/api/Recommendation/post"))
                                 .andExpect(status().is(403)); // only admins can post
         }
 
@@ -88,23 +88,19 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 LocalDateTime dateRequested = LocalDateTime.parse("2022-03-11T00:00:00");
                 LocalDateTime dateNeeded = LocalDateTime.parse("2022-04-15T00:00:00");
 
-                long id = 7;
-                boolean done = true;
-
                 Recommendation recommendation = Recommendation.builder()
-                                .id(id)
                                 .requesterEmail("requester@ucsb.edu")
                                 .professorEmail("professor@ucsb.edu")
-                                .explanation("reason")
+                                .explanation("explanation reason")
                                 .dateRequested(dateRequested)
                                 .dateNeeded(dateNeeded)
-                                .done(done)
+                                .done(true)
                                 .build();
 
                 when(recommendationRepository.findById(eq(7L))).thenReturn(Optional.of(recommendation));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/recommendations?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/Recommendation?id=7"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
@@ -124,7 +120,7 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 when(recommendationRepository.findById(eq(7L))).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/recommendations?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/Recommendation?id=7"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
@@ -145,27 +141,22 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 LocalDateTime dateRequested2 = LocalDateTime.parse("2022-01-20T00:00:00");
                 LocalDateTime dateNeeded2 = LocalDateTime.parse("2022-07-19T00:00:00");
 
-                long id = 7;
-                boolean done = true;
-
                 Recommendation recommendation1 = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("requester@ucsb.edu")
                                         .professorEmail("professor@ucsb.edu")
                                         .explanation("reason")
                                         .dateRequested(dateRequested)
                                         .dateNeeded(dateNeeded)
-                                        .done(done)
+                                        .done(true)
                                 .build();
 
                 Recommendation recommendation2 = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("requester@ucsb.edu")
                                         .professorEmail("professor@ucsb.edu")
-                                        .explanation("reason")
+                                        .explanation("reason updated")
                                         .dateRequested(dateRequested2)
                                         .dateNeeded(dateNeeded2)
-                                        .done(done)
+                                        .done(true)
                                 .build();
 
                 ArrayList<Recommendation> expectedRecommendations = new ArrayList<>();
@@ -174,7 +165,7 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 when(recommendationRepository.findAll()).thenReturn(expectedRecommendations);
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/recommendations/all"))
+                MvcResult response = mockMvc.perform(get("/api/Recommendation/all"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
@@ -189,27 +180,24 @@ public class RecommendationControllerTests extends ControllerTestCase {
         @Test
         public void an_admin_user_can_post_a_new_recommendation() throws Exception {
                 // arrange
-                LocalDateTime dateRequested = LocalDateTime.parse("2022-03-11T00:00:00");
-                LocalDateTime dateNeeded = LocalDateTime.parse("2022-04-15T00:00:00");
+                LocalDateTime dRequested = LocalDateTime.parse("2022-03-11T00:00:00");
+                LocalDateTime dNeeded = LocalDateTime.parse("2022-04-15T00:00:00");
 
-                long id = 7;
-                boolean done = true;
 
                 Recommendation recommendation1 = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("requester@ucsb.edu")
                                         .professorEmail("professor@ucsb.edu")
                                         .explanation("reason")
-                                        .dateRequested(dateRequested)
-                                        .dateNeeded(dateNeeded)
-                                        .done(done)
+                                        .dateRequested(dRequested)
+                                        .dateNeeded(dNeeded)
+                                        .done(true)
                                 .build();
 
                 when(recommendationRepository.save(eq(recommendation1))).thenReturn(recommendation1);
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/recommendations/post?id=7&requesterEmail=requester@ucsb.edu&professorEmail=professor@ucsb.edu&explanation=reason&dateRequested=2022-03-11T00:00:00&dateNeeded=2022-04-15T00:00:00&done=true")
+                                post("/api/Recommendation/post?requesterEmail=requester@ucsb.edu&professorEmail=professor@ucsb.edu&explanation=reason&dateRequested=2022-03-11T00:00:00&dateNeeded=2022-04-15T00:00:00&done=true")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -227,24 +215,20 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 LocalDateTime dateRequested = LocalDateTime.parse("2022-03-11T00:00:00");
                 LocalDateTime dateNeeded = LocalDateTime.parse("2022-04-15T00:00:00");
 
-                long id = 7;
-                boolean done = true;
-
                 Recommendation recommendation1 = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("requester@ucsb.edu")
                                         .professorEmail("professor@ucsb.edu")
                                         .explanation("reason")
                                         .dateRequested(dateRequested)
                                         .dateNeeded(dateNeeded)
-                                        .done(done)
+                                        .done(true)
                                 .build();
 
                 when(recommendationRepository.findById(eq(15L))).thenReturn(Optional.of(recommendation1));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/recommendations?id=15")
+                                delete("/api/Recommendation?id=15")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -266,7 +250,7 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/recommendations?id=15")
+                                delete("/api/Recommendation?id=15")
                                                 .with(csrf()))
                                 .andExpect(status().isNotFound()).andReturn();
 
@@ -285,37 +269,31 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 LocalDateTime dateRequested2 = LocalDateTime.parse("2022-01-20T00:00:00");
                 LocalDateTime dateNeeded2 = LocalDateTime.parse("2022-07-19T00:00:00");
 
-                long id = 7;
-                boolean done = true;
-                boolean done2 = false;
-
                 Recommendation recommendationOrig = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("requester@ucsb.edu")
                                         .professorEmail("professor@ucsb.edu")
                                         .explanation("reason")
                                         .dateRequested(dateRequested)
                                         .dateNeeded(dateNeeded)
-                                        .done(done)
+                                        .done(false)
                                 .build();
 
                 Recommendation recommendationEdited = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("newRequester@ucsb.edu")
                                         .professorEmail("newProfessor@ucsb.edu")
                                         .explanation("newReason")
                                         .dateRequested(dateRequested2)
                                         .dateNeeded(dateNeeded2)
-                                        .done(done2)
+                                        .done(true)
                                 .build();
 
-                String requestBody = mapper.writeValueAsString(recommendationEdited);
+                String requestBody = mapper.writeValueAsString(recommendationOrig);
 
-                when(recommendationRepository.findById(eq(67L))).thenReturn(Optional.of(recommendationOrig));
+                when(recommendationRepository.findById(eq(67L))).thenReturn(Optional.of(recommendationEdited));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/recommendations?id=67")
+                                put("/api/Recommendation?id=67")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -324,7 +302,7 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
                 // assert
                 verify(recommendationRepository, times(1)).findById(67L);
-                verify(recommendationRepository, times(1)).save(recommendationEdited); // should be saved with correct user
+                verify(recommendationRepository, times(1)).save(recommendationOrig); // should be saved with correct user
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(requestBody, responseString);
         }
@@ -337,17 +315,13 @@ public class RecommendationControllerTests extends ControllerTestCase {
                 LocalDateTime dateRequested = LocalDateTime.parse("2022-03-11T00:00:00");
                 LocalDateTime dateNeeded = LocalDateTime.parse("2022-04-15T00:00:00");
 
-                long id = 7;
-                boolean done = true;
-
                 Recommendation recommendationEdited = Recommendation.builder()
-                                        .id(id)
                                         .requesterEmail("requester@ucsb.edu")
                                         .professorEmail("professor@ucsb.edu")
                                         .explanation("reason")
                                         .dateRequested(dateRequested)
                                         .dateNeeded(dateNeeded)
-                                        .done(done)
+                                        .done(true)
                                 .build();
 
                 String requestBody = mapper.writeValueAsString(recommendationEdited);
@@ -356,7 +330,7 @@ public class RecommendationControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/recommendations?id=67")
+                                put("/api/Recommendation?id=67")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)

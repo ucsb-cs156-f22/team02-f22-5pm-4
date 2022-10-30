@@ -27,7 +27,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 @Api(description = "recommendations")
-@RequestMapping("/api/recommendations")
+@RequestMapping("/api/Recommendation")
 @RestController
 @Slf4j
 public class RecommendationController extends ApiController {
@@ -44,13 +44,12 @@ public class RecommendationController extends ApiController {
     }
 
 public Recommendation postRecommendation(
-    @ApiParam("id") @RequestParam Long id,
     @ApiParam("requesterEmail") @RequestParam String requesterEmail,
     @ApiParam("professorEmail") @RequestParam String professorEmail,
     @ApiParam("explanation") @RequestParam String explanation,
-    @ApiParam("done") @RequestParam boolean done,
     @ApiParam("dateRequested (in iso format, e.g. YYYY-mm-dd; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("dateRequested") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateRequested,
-    @ApiParam("dateNeeded (in iso format, e.g. YYYY-mm-dd; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("dateNeeded") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateNeeded)
+    @ApiParam("dateNeeded (in iso format, e.g. YYYY-mm-dd; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("dateNeeded") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateNeeded,
+    @ApiParam("done") @RequestParam boolean done)
         
         throws JsonProcessingException {
 
@@ -61,9 +60,9 @@ public Recommendation postRecommendation(
         recommendation.setRequesterEmail(requesterEmail);
         recommendation.setProfessorEmail(professorEmail);
         recommendation.setExplanation(explanation);
-        recommendation.setDone(done);
         recommendation.setDateRequested(dateRequested);
         recommendation.setDateNeeded(dateNeeded);
+        recommendation.setDone(done);
 
         Recommendation saveRecommendation = recommendationRepository.save(recommendation);
 
@@ -74,11 +73,9 @@ public Recommendation postRecommendation(
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
     public Recommendation getById(
-        @ApiParam("id") @RequestParam Long id,
-        @RequestBody @Valid Recommendation incoming) {
-
+        @ApiParam("id") @RequestParam Long id) {
         Recommendation recommendation = recommendationRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
+        .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
 
         return recommendation;
     }
@@ -93,13 +90,12 @@ public Recommendation postRecommendation(
         Recommendation recommendation = recommendationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
 
-        recommendation.setId(incoming.getId());
-        recommendation.setDateNeeded(incoming.getDateNeeded());
-        recommendation.setDateRequested(incoming.getDateRequested());
-        recommendation.setDone(incoming.getDone());
-        recommendation.setExplanation(incoming.getExplanation());
-        recommendation.setProfessorEmail(incoming.getProfessorEmail());
         recommendation.setRequesterEmail(incoming.getRequesterEmail());
+        recommendation.setProfessorEmail(incoming.getProfessorEmail());
+        recommendation.setExplanation(incoming.getExplanation());
+        recommendation.setDateRequested(incoming.getDateRequested());
+        recommendation.setDateNeeded(incoming.getDateNeeded());
+        recommendation.setDone(incoming.getDone());
         recommendationRepository.save(recommendation);
 
         return recommendation;
