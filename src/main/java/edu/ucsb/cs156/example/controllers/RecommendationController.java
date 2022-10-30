@@ -43,6 +43,9 @@ public class RecommendationController extends ApiController {
         return recommendations;
     }
 
+    @ApiOperation(value = "Create a new recommendation")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/post")
 public Recommendation postRecommendation(
     @ApiParam("requesterEmail") @RequestParam String requesterEmail,
     @ApiParam("professorEmail") @RequestParam String professorEmail,
@@ -66,7 +69,7 @@ public Recommendation postRecommendation(
 
         Recommendation saveRecommendation = recommendationRepository.save(recommendation);
 
-        return recommendation;
+        return saveRecommendation;
     }
 
     @ApiOperation(value = "Get a single recommendation")
