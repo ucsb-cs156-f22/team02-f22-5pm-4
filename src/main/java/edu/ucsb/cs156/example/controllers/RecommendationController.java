@@ -57,8 +57,7 @@ public Recommendation postRecommendation(
     // For an explanation of @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     // See: https://www.baeldung.com/spring-date-parameters
 
-    edu.ucsb.cs156.example.entities.Recommendation recommendation = new Recommendation();
-        recommendation.setID(id);
+        Recommendation recommendation = new Recommendation();
         recommendation.setRequesterEmail(requesterEmail);
         recommendation.setProfessorEmail(professorEmail);
         recommendation.setExplanation(explanation);
@@ -75,9 +74,11 @@ public Recommendation postRecommendation(
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
     public Recommendation getById(
-            @ApiParam("id") @RequestParam Long id) {
+        @ApiParam("id") @RequestParam Long id,
+        @RequestBody @Valid Recommendation incoming) {
+
         Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
+            .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
 
         return recommendation;
     }
@@ -89,17 +90,16 @@ public Recommendation postRecommendation(
             @ApiParam("id") @RequestParam Long id,
             @RequestBody @Valid edu.ucsb.cs156.example.entities.Recommendation incoming) {
 
-        edu.ucsb.cs156.example.entities.Recommendation recommendation = recommendationRepository.findById(id)
+        Recommendation recommendation = recommendationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
 
-        recommendation.setId(id);
+        recommendation.setId(incoming.getId());
         recommendation.setDateNeeded(incoming.getDateNeeded());
         recommendation.setDateRequested(incoming.getDateRequested());
         recommendation.setDone(incoming.getDone());
         recommendation.setExplanation(incoming.getExplanation());
         recommendation.setProfessorEmail(incoming.getProfessorEmail());
-        recommendation.setRequesterEmail(incoming.getProfessorEmail());
-
+        recommendation.setRequesterEmail(incoming.getRequesterEmail());
         recommendationRepository.save(recommendation);
 
         return recommendation;
@@ -110,11 +110,10 @@ public Recommendation postRecommendation(
     @DeleteMapping("")
     public Object deleteRecommendation(
             @ApiParam("id") @RequestParam Long id) {
-        Recommendation recommendation = recommendation.findById(id)
+        Recommendation recommendation = recommendationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Recommendation.class, id));
 
         recommendationRepository.delete(recommendation);
         return genericMessage("Recommendation with id %s deleted".formatted(id));
     }
-
 }
