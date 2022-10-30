@@ -1,4 +1,4 @@
-package main.java.edu.ucsb.cs156.example.entities;
+package edu.ucsb.cs156.example.entities;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +21,7 @@ import lombok.Builder;
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     private String title;
     private String url;
