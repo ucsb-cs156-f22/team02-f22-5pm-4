@@ -43,7 +43,7 @@ public class ArticleController extends ApiController {
         return articles;
     }
 
-    /* 
+    
     @ApiOperation(value = "Get a single article")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
@@ -54,7 +54,7 @@ public class ArticleController extends ApiController {
 
         return article;
     }
-    */
+    
 
     @ApiOperation(value = "Create a article")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

@@ -56,13 +56,13 @@ public class ArticleControllerTests extends ControllerTestCase {
             mockMvc.perform(get("/api/Article/all"))
                             .andExpect(status().is(200)); // logged
     }
-    /*
+    
     @Test
     public void logged_out_users_cannot_get_by_id() throws Exception {
             mockMvc.perform(get("/api/Article?id=7"))
                             .andExpect(status().is(403)); // logged out users can't get by id
     }
-    */
+    
     
     // Authorization tests for /api/Article/post
     
