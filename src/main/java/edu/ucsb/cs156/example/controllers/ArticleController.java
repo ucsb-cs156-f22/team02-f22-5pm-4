@@ -64,7 +64,7 @@ public class ArticleController extends ApiController {
             @ApiParam("url") @RequestParam String url,
             @ApiParam("explanation") @RequestParam String explanation,
             @ApiParam("email") @RequestParam String email,
-            @ApiParam("date (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("localDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime localDateTime)
+            @ApiParam("date (in iso format, e.g. YYYY-mm-ddTHH:MM:SS; see https://en.wikipedia.org/wiki/ISO_8601)") @RequestParam("dateAdded") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime localDateTime)
             throws JsonProcessingException {
 
         // For an explanation of @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -84,5 +84,36 @@ public class ArticleController extends ApiController {
         return savedArticle;
     }
 
-     
+    @ApiOperation(value = "Delete a Article")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("")
+    public Object deleteArticle(
+            @ApiParam("id") @RequestParam Long id) {
+        Article article = articleRespository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Article.class, id));
+
+        articleRespository.delete(article);
+        return genericMessage("Article with id %s deleted".formatted(id));
+    }
+
+    @ApiOperation(value = "Update a single article")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public Article updateArticle(
+            @ApiParam("id") @RequestParam Long id,
+            @RequestBody @Valid Article incoming) {
+
+        Article article = articleRespository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Article.class, id));
+
+        article.setTitle(incoming.getTitle());
+        article.setUrl(incoming.getUrl());
+        article.setExplanation(incoming.getExplanation());
+        article.setEmail(incoming.getEmail());
+        article.setDateAdded(incoming.getDateAdded());
+
+        articleRespository.save(article);
+
+        return article;
+    }
 }
