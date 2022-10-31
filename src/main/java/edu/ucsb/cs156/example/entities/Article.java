@@ -1,6 +1,5 @@
 package edu.ucsb.cs156.example.entities;
 
-import java.lang.annotation.Inherited;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -13,18 +12,19 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
-
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "ucsborganization")
-public class UCSBOrganization {
-    @Id
-    private String orgCode;
+@Entity(name = "articles")
 
-    private String orgTranslationShort;
-    private String orgTranslation;
-    private boolean inactive;
+public class Article {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    private String title;
+    private String url;
+    private String explanation;
+    private String email;
+    private LocalDateTime dateAdded;
 }
