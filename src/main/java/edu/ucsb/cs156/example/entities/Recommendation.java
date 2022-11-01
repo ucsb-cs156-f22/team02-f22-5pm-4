@@ -20,10 +20,11 @@ import lombok.Builder;
 public class Recommendation {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id; 
+  private long id;
+  
   private String requesterEmail;
   private String professorEmail;
-  private String explination;
+  private String explanation;
   private LocalDateTime dateRequested;
   private LocalDateTime dateNeeded;
   private boolean done;   
